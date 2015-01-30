@@ -5,32 +5,40 @@ import java.util.*;
 
 public class FileInput {
 
-	// public ArrayList<LogFile> allList = new ArrayList<LogFile>();
-	// public Vector<LogFile> allVector = new Vector<LogFile>();
+	private Vector<LogFile> logVector;
 
-	public void input() throws IOException {
+	public void setLogVector(Vector<LogFile> logVector) {
+		this.logVector = logVector;
+	}
+	
+	public Vector<LogFile> input(String inputFile) throws IOException {
 
-		FileReader in = new FileReader("input.log");
+		FileReader in = new FileReader(inputFile);
 		BufferedReader bin = new BufferedReader(in);
 
-		String logLine = bin.readLine();
-		System.out.println(logLine);
+		while(bin.read()!=-1)
+		{
+			LogFile log = new LogFile();
+			
+			String line = bin.readLine();
+			setLogFile(log, line);	
 
-		setLogFile(logLine);
+			logVector.add(log);
+		}
 
 		in.close();
 		bin.close();
+		
+		return logVector;
 	}
 
-	public void setLogFile(String logLine) {
+	public void setLogFile(LogFile logFile, String line) {
 
-		LogFile log = new LogFile();
-
-		StringTokenizer st = new StringTokenizer(logLine, "[]");
-		log.setStatus(st.nextToken());
-		log.setURL(st.nextToken());
-		log.setWeb(st.nextToken());
-		log.setTime(st.nextToken());
+		StringTokenizer st = new StringTokenizer(line, "[]");
+		logFile.setStatus(st.nextToken());
+		logFile.setURL(st.nextToken());
+		logFile.setWeb(st.nextToken());
+		logFile.setTime(st.nextToken());
 	}
-
+	
 }

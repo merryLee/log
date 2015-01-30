@@ -7,6 +7,10 @@ public class LogFile {
 	private String web;
 	private String time;
 
+	public LogFile() {
+
+	}
+
 	public String getStatus() {
 		return status;
 	}

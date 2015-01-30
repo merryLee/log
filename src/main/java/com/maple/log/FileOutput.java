@@ -1,5 +1,21 @@
 package com.maple.log;
 
-public class FileOutput {
+import java.io.*;
+
+public class FileOutput extends Analysis {
+
+	public void output(String outputFile) throws IOException {
+
+		FileWriter out;
+
+		out = new FileWriter(outputFile);
+
+		
+		
+		// fout.write(""+ "\r\n");
+
+		out.close();
+
+	}
 
 }
