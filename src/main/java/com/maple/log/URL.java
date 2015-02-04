@@ -2,156 +2,124 @@ package com.maple.log;
 
 import java.util.*;
 
-public class URL {	
+public class URL {
 
-	String string;	
+	LogFile log;
+	String string;
 	Map<String, Integer> hashMap = new HashMap<String, Integer>();
-	int start,end;
-	
+	int start, end;
 
-
-	
-	public void print(Vector<LogFile> logVector) {
+	public void calculateService(Vector<LogFile> logVector) {
 
 		Iterator<LogFile> it = logVector.iterator();
 		
-		LogFile log = it.next();
-		
-		string = log.getURL();
-		start = string.indexOf("search/");		
-		end = string.indexOf("?");
-		if(end != -1) {
-		string = string.substring(start+7,end);
-		}	
-		
+		setString(it, "search/", "?");
 		hashMap.put(string, 1);
-		
+
 		while (it.hasNext()) {
 			log = it.next();
 
 			if (log != null) {
-
-				string = log.getURL();
-				start = string.indexOf("search/");		
-				end = string.indexOf("?");
-				
-				if (end != -1) {
-					string = string.substring(start + 7, end);
-					setHashMap(string, hashMap);
-				}
+				setString(it, "search/", "?");
+				setHashMap(string, hashMap);
 			}
 		}
-		
-		Set<String> keySet = hashMap.keySet();
-		int maxValue=0; String maxKey = null;
-		
+		getTopService();
+	}
 
-		List<Integer> strList = new ArrayList<Integer>();
+	public void calculateApiKey(Vector<LogFile> logVector) {
+
+		Iterator<LogFile> it = logVector.iterator();
 		
-		for(String s : keySet) {
-			Integer score = hashMap.get(s);
-			strList.add(score);
+		setString(it, "apikey=", "&");
+		hashMap.put(string, 1);
+
+		while (it.hasNext()) {
+			log = it.next();
+
+			if (log != null) {
+				setString(it, "apikey=", "&");				
+				setHashMap(string, hashMap);
+			}
 		}
-		
-		Collections.sort(strList);
-		Collections.reverse(strList);
-		
-		for(String s : keySet) {
+		searchMaxApikey();
+	}
+
+	
+	private void getTopService() {
+		List<Integer> strList = createList();
+
+		Set<String> keySet = hashMap.keySet();
+		int maxValue = 0;
+		String maxKey = null;
+
+		for (String s : keySet) {
 			Integer score = hashMap.get(s);
-			if(score==strList.get(2)) { 
+			if (score == strList.get(2)) {
 				maxKey = s;
 			}
 		}
-		
+
 		System.out.println(maxKey + strList.get(2));
-	
-		
-		
 	}
-	
 
+	private List<Integer> createList() {
+		List<Integer> valueList = new ArrayList<Integer>();
 
-	
-	public void print2(Vector<LogFile> logVector) {
+		Set<String> keySet = hashMap.keySet();
 
-		Iterator<LogFile> it = logVector.iterator();
-		
-		LogFile log = it.next();
-		
-		string = log.getURL();
-		start = string.indexOf("apikey=");
-		end = string.indexOf("&");
-		
-		if(start != -1) {
-		string = string.substring(start+7,end-1);
-		}	
-		
-		hashMap.put(string, 1);
-		
-		while (it.hasNext()) {
-			log = it.next();
-
-			if (log != null) {
-
-				string = log.getURL();
-				start = string.indexOf("apikey=");
-				end = string.indexOf("&");
-		
-				if (start != -1) {
-					string = string.substring(start + 7, end-1);
-					setHashMap(string, hashMap);			
-				}
-			}
-
+		for (String s : keySet) {
+			Integer score = hashMap.get(s);
+			valueList.add(score);
 		}
-		
-		searchMaxApikey();
-		
+
+		Collections.sort(valueList);
+		Collections.reverse(valueList);
+
+		return valueList;
 	}
-
-
-
-
+	
 	private void searchMaxApikey() {
 		Set<String> keySet = hashMap.keySet();
-		int maxValue=0; String maxKey = null;
-		
-		for(String s : keySet) {
+		int maxValue = 0;
+		String maxKey = null;
+
+		for (String s : keySet) {
 			Integer score = hashMap.get(s);
-			if(score>maxValue) { 
+			if (score > maxValue) {
 				maxValue = score;
 				maxKey = s;
 			}
 		}
-		
+
 		System.out.println(maxKey + " " + maxValue);
+	}
 
-/*	
-	for (String o : keySet) {
-	    if (hashMap.get(o).equals(836)) {
-	      maxKey = o;
-	    }
-	  }
+	private void setString(Iterator<LogFile> it, String key1, String key2) {
+		
+		do {
+			log = it.next();
+
+			string = log.getURL();
+			start = string.indexOf(key1);
+			end = string.indexOf(key2);
+
+		} while (start != -1 || end != -1);
+		
+		string = string.substring(start + 7, end);
+	}
 	
-	System.out.println(maxKey);
-*/
-	}	
-	
-
-
-
-
 	private void setHashMap(String string, Map<String, Integer> hashMap) {
-		if (hashMap.containsKey(string)) { //이미 존재하는 값이면? ++해서 다시풋.
-			
-			Integer score = hashMap.get(string);					
-			score++;
-			hashMap.put(string, score);
-		}
 
-		else { //존재하지 않는 값이면 풋.
+		if (hashMap.containsKey(string)) {
+			Integer count = hashMap.get(string);
+			count++;
+			hashMap.put(string, count);
+		}
+		else {
 			hashMap.put(string, 1);
 		}
 	}
 	
+
 }
